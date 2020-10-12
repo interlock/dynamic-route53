@@ -43,6 +43,10 @@ func init() {
 	viper.BindPFlag("frequency", rootCmd.PersistentFlags().Lookup("frequency"))
 	rootCmd.PersistentFlags().Bool("immediate", true, "immediately start refresh on start")
 	viper.BindPFlag("immediate", rootCmd.PersistentFlags().Lookup("immediate"))
+	rootCmd.PersistentFlags().Bool("profile",false,"Enable profiling")
+	viper.BindPFlag("profile", rootCmd.PersistentFlags().Lookup("profile"))
+	rootCmd.PersistentFlags().Int32("profile-port",6660,"Port for profiling")
+	viper.BindPFlag("profile-port",rootCmd.PersistentFlags().Lookup("profile-port"))
 }
 
 var validNetworkFlags = []string{"tcp4", "tcp6"}
