@@ -1,0 +1,10 @@
+on: push
+name: go test
+jobs:
+  go-pipeline:
+    name: Go Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: go1.13 test
+      uses: shoukoo/golang-pipeline/go1.13/test@master
+      

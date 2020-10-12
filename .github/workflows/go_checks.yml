@@ -1,0 +1,16 @@
+name: Go checks, tests and release
+
+on: push
+jobs:
+  go-pipeline:
+    name: Go Checks
+    runs-on: ubuntu-latest
+    steps:
+    - name: go1.13 linter
+      uses: shoukoo/golang-pipeline/go1.13/linter@master
+      env:
+        STATICCHECK: on
+        GOLINT: on
+        GOLINTPATH: github.com/interlock/dynamic-route53
+        MISSPELL: off
+        ERRCHECK: on
