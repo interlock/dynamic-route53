@@ -10,7 +10,7 @@ import (
 
 func lookup(network string) (string, error) {
 	transport := &http.Transport{
-		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+		DialContext: func(ctx context.Context, _network, addr string) (net.Conn, error) {
 			return net.Dial(network, addr)
 		},
 	}

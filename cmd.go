@@ -1,19 +1,23 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/route53"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	flag.Parse()
+	err := rootCmd.Execute()
+	if err != nil {
+		panic(err)
+	}
 	errs := validateFlags()
 	if len(errs) != 0 {
 		for _, e := range errs {
@@ -27,9 +31,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ip, err := lookup(*networkFlag)
+	ip, err := lookup(viper.GetString("lookup"))
 	if err != nil {
 		log.Fatal(err)
+	}
+	log.Printf("Discovered IP: %s", ip)
+	recordSetType := "A"
+	if strings.Compare(viper.GetString("network"), "tcp6") == 0 {
+		recordSetType = "AAAA"
 	}
 	svc := route53.New(sess)
 	input := &route53.ChangeResourceRecordSetsInput{
@@ -38,20 +47,20 @@ func main() {
 				{
 					Action: aws.String("UPSERT"),
 					ResourceRecordSet: &route53.ResourceRecordSet{
-						Name: aws.String(*domainFlag),
+						Name: aws.String(viper.GetString("domain")),
 						ResourceRecords: []*route53.ResourceRecord{
 							{
 								Value: aws.String(ip),
 							},
 						},
-						TTL:  aws.Int64(*ttlFlag),
-						Type: aws.String("A"),
+						TTL:  aws.Int64(viper.GetInt64("ttl")),
+						Type: aws.String(recordSetType),
 					},
 				},
 			},
-			Comment: aws.String(*commentFlag),
+			Comment: aws.String(viper.GetString("comment")),
 		},
-		HostedZoneId: aws.String(*hostedZoneIDFlag),
+		HostedZoneId: aws.String(viper.GetString("hosted-zone-id")),
 	}
 	result, err := svc.ChangeResourceRecordSets(input)
 	if err != nil {
@@ -75,9 +84,8 @@ func main() {
 			// Message from an error.
 			fmt.Println(err.Error())
 		}
-		return
+		os.Exit(2)
 	}
 
-	fmt.Println(result)
-
+	log.Printf("Finished Request: %s", *result.ChangeInfo.Id)
 }
