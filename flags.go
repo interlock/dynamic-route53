@@ -39,7 +39,7 @@ func init() {
 	viper.BindPFlag("ttl", rootCmd.PersistentFlags().Lookup("ttl"))
 	rootCmd.PersistentFlags().String("comment", "", "comment to RecordSet")
 	viper.BindPFlag("comment", rootCmd.PersistentFlags().Lookup("comment"))
-	rootCmd.PersistentFlags().Uint64P("frequency", "f", 0, "frequency to refresh. 0 value is once")
+	rootCmd.PersistentFlags().Int64P("frequency", "f", 0, "frequency to refresh. 0 value is once")
 	viper.BindPFlag("frequency", rootCmd.PersistentFlags().Lookup("frequency"))
 	rootCmd.PersistentFlags().Bool("immediate", true, "immediately start refresh on start")
 	viper.BindPFlag("immediate", rootCmd.PersistentFlags().Lookup("immediate"))
