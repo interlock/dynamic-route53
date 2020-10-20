@@ -4,6 +4,12 @@ This cli application enables updating an AWS Route53 HostedZone Record with an i
 
 ## Usage
 
+```
+./dynamic-route53 --hosted-zone-id=<zone_id> \
+    --domain=my.domain.com --network tcp4 \
+    --frequency=20
+```
+
 ## Configuration
 
 - AWS_ACCESS_KEY - required env variable to interact with AWS
