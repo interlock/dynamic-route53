@@ -51,31 +51,35 @@ func doUpdate() error {
 		},
 		HostedZoneId: aws.String(viper.GetString("hosted-zone-id")),
 	}
-	result, err := svc.ChangeResourceRecordSets(input)
-	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case route53.ErrCodeNoSuchHostedZone:
-				fmt.Println(route53.ErrCodeNoSuchHostedZone, aerr.Error())
-			case route53.ErrCodeNoSuchHealthCheck:
-				fmt.Println(route53.ErrCodeNoSuchHealthCheck, aerr.Error())
-			case route53.ErrCodeInvalidChangeBatch:
-				fmt.Println(route53.ErrCodeInvalidChangeBatch, aerr.Error())
-			case route53.ErrCodeInvalidInput:
-				fmt.Println(route53.ErrCodeInvalidInput, aerr.Error())
-			case route53.ErrCodePriorRequestNotComplete:
-				fmt.Println(route53.ErrCodePriorRequestNotComplete, aerr.Error())
-			default:
-				fmt.Println(aerr.Error())
+	if viper.GetBool("dry") {
+		log.Printf("%v", input)
+	} else {
+		result, err := svc.ChangeResourceRecordSets(input)
+		if err != nil {
+			if aerr, ok := err.(awserr.Error); ok {
+				switch aerr.Code() {
+				case route53.ErrCodeNoSuchHostedZone:
+					fmt.Println(route53.ErrCodeNoSuchHostedZone, aerr.Error())
+				case route53.ErrCodeNoSuchHealthCheck:
+					fmt.Println(route53.ErrCodeNoSuchHealthCheck, aerr.Error())
+				case route53.ErrCodeInvalidChangeBatch:
+					fmt.Println(route53.ErrCodeInvalidChangeBatch, aerr.Error())
+				case route53.ErrCodeInvalidInput:
+					fmt.Println(route53.ErrCodeInvalidInput, aerr.Error())
+				case route53.ErrCodePriorRequestNotComplete:
+					fmt.Println(route53.ErrCodePriorRequestNotComplete, aerr.Error())
+				default:
+					fmt.Println(aerr.Error())
+				}
+			} else {
+				// Print the error, cast err to awserr.Error to get the Code and
+				// Message from an error.
+				fmt.Println(err.Error())
 			}
-		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
-			fmt.Println(err.Error())
+			os.Exit(2)
 		}
-		os.Exit(2)
-	}
 
-	log.Printf("Finished Request: %s", *result.ChangeInfo.Id)
+		log.Printf("Finished Request: %s", *result.ChangeInfo.Id)
+	}
 	return nil
 }

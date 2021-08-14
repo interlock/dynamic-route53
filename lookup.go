@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strings"
 )
 
 func lookup(network string) (string, error) {
@@ -27,5 +28,5 @@ func lookup(network string) (string, error) {
 		log.Fatal(err)
 	}
 
-	return string(ip), err
+	return strings.TrimSpace(string(ip)), err
 }

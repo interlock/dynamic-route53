@@ -4,6 +4,9 @@ build: *.go
 run: build
 	./dynamic-route53
 
+test:
+	go test ./...
+
 docker:
 	docker build -t dynamic-route53:latest .
 .PHONY: docker
