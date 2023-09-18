@@ -19,10 +19,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if viper.GetBool("profile") {
+	if viper.GetBool(FLAG_PROFILE)) {
 		go func() {
-			log.Printf("Starting Profiler localhost:%d", viper.GetInt32("profile-port"))
-			log.Println(http.ListenAndServe(fmt.Sprintf("localhost:%d", viper.GetInt32("profile-port")), nil))
+			log.Printf("starting profiler localhost:%d", viper.GetInt32(FLAG_PROFILE_PORT))
+			log.Println(http.ListenAndServe(fmt.Sprintf("localhost:%d", viper.GetInt32(FLAG_PROFILE_PORT)), nil))
 		}()
 	}
 	errs := validateFlags()
@@ -32,11 +32,11 @@ func main() {
 		}
 		os.Exit(1)
 	}
-	log.Printf("Frequency: %v", viper.GetInt64("frequency"))
-	var dur time.Duration = time.Duration(viper.GetInt64("frequency")) * time.Second
+	log.Printf("frequency: %v", viper.GetInt64(FLAG_FREQUENCY))
+	var dur time.Duration = time.Duration(viper.GetInt64(FLAG_FREQUENCY)) * time.Second
 
 	timer := time.NewTimer(dur)
-	log.Printf("Start timer (%d)", dur)
+	log.Printf("start timer (%d)", dur)
 	var errChan chan error
 	var exit bool = false
 	for {
@@ -46,16 +46,16 @@ func main() {
 			errChan = update()
 		case err := <-errChan:
 			if err != nil {
-				log.Printf("Error: %s", err.Error())
+				log.Printf("error: %s", err.Error())
 			}
 			errChan = nil
 			if dur == 0 {
 				timer.Stop()
-				log.Printf("Finished single run")
+				log.Printf("finished single run")
 				exit = true
 				break
 			}
-			log.Print("Restarting Timer")
+			log.Print("restarting Timer")
 			timer.Reset(dur)
 		}
 		if exit == true {

@@ -20,13 +20,13 @@ func doUpdate() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ip, err := lookup(viper.GetString("network"))
+	ip, err := lookup(viper.GetString(FLAG_NETWORK))
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Discovered IP: %s", ip)
+	log.Printf("discovered IP: %s", ip)
 	recordSetType := "A"
-	if strings.Compare(viper.GetString("network"), "tcp6") == 0 {
+	if strings.Compare(viper.GetString(FLAG_NETWORK), "tcp6") == 0 {
 		recordSetType = "AAAA"
 	}
 	svc := route53.New(sess)
@@ -36,22 +36,22 @@ func doUpdate() error {
 				{
 					Action: aws.String("UPSERT"),
 					ResourceRecordSet: &route53.ResourceRecordSet{
-						Name: aws.String(viper.GetString("domain")),
+						Name: aws.String(viper.GetString(FLAG_DOMAIN)),
 						ResourceRecords: []*route53.ResourceRecord{
 							{
 								Value: aws.String(ip),
 							},
 						},
-						TTL:  aws.Int64(viper.GetInt64("ttl")),
+						TTL:  aws.Int64(viper.GetInt64(FLAG_TTL)),
 						Type: aws.String(recordSetType),
 					},
 				},
 			},
-			Comment: aws.String(viper.GetString("comment")),
+			Comment: aws.String(viper.GetString(FLAG_COMMENT)),
 		},
-		HostedZoneId: aws.String(viper.GetString("hosted-zone-id")),
+		HostedZoneId: aws.String(viper.GetString(FLAG_HOSTED_ZONE_ID)),
 	}
-	if viper.GetBool("dry") {
+	if viper.GetBool(FLAG_DRY) {
 		log.Printf("%v", input)
 	} else {
 		result, err := svc.ChangeResourceRecordSets(input)
@@ -79,7 +79,7 @@ func doUpdate() error {
 			os.Exit(2)
 		}
 
-		log.Printf("Finished Request: %s", *result.ChangeInfo.Id)
+		log.Printf("finished Request: %s", *result.ChangeInfo.Id)
 	}
 	return nil
 }
