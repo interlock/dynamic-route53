@@ -20,13 +20,14 @@ func doUpdate() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ip, err := lookup(viper.GetString(FLAG_NETWORK))
+	network := viper.GetString(FLAG_NETWORK)
+	ip, err := lookup(network)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("lookup", err)
 	}
 	log.Printf("discovered IP: %s", ip)
 	recordSetType := "A"
-	if strings.Compare(viper.GetString(FLAG_NETWORK), "tcp6") == 0 {
+	if strings.Compare(network, "tcp6") == 0 {
 		recordSetType = "AAAA"
 	}
 	svc := route53.New(sess)

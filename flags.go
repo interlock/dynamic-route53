@@ -90,11 +90,11 @@ func containsValue(value string, options []string) bool {
 func validateFlags() []error {
 	var errors []error
 
-	if containsValue(viper.GetString(FLAG_NETWORK), validNetworkFlags) == false {
-		errors = append(errors, fmt.Errorf("Expected network flag to be %s", strings.Join(validNetworkFlags, ",")))
+	if !containsValue(viper.GetString(FLAG_NETWORK), validNetworkFlags) {
+		errors = append(errors, fmt.Errorf("expected network flag to be %s", strings.Join(validNetworkFlags, ",")))
 	}
-	if containsValue(viper.GetString(FLAG_NETWORK), validLookupFlags) == false {
-		errors = append(errors, fmt.Errorf("Expected lookup flag %s", strings.Join(validLookupFlags, ",")))
+	if !containsValue(viper.GetString(FLAG_LOOKUP), validLookupFlags) {
+		errors = append(errors, fmt.Errorf("expected lookup flag %s", strings.Join(validLookupFlags, ",")))
 	}
 	if len(viper.GetString(FLAG_DOMAIN)) == 0 {
 		errors = append(errors, fmt.Errorf("domain is required"))

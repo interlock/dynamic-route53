@@ -19,7 +19,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if viper.GetBool(FLAG_PROFILE)) {
+	if viper.GetBool(FLAG_PROFILE) {
 		go func() {
 			log.Printf("starting profiler localhost:%d", viper.GetInt32(FLAG_PROFILE_PORT))
 			log.Println(http.ListenAndServe(fmt.Sprintf("localhost:%d", viper.GetInt32(FLAG_PROFILE_PORT)), nil))
@@ -34,8 +34,12 @@ func main() {
 	}
 	log.Printf("frequency: %v", viper.GetInt64(FLAG_FREQUENCY))
 	var dur time.Duration = time.Duration(viper.GetInt64(FLAG_FREQUENCY)) * time.Second
-
-	timer := time.NewTimer(dur)
+	var timer *time.Timer
+	if viper.GetBool(FLAG_IMMEDIATE) {
+		timer = time.NewTimer(time.Duration(0))
+	} else {
+		timer = time.NewTimer(dur)
+	}
 	log.Printf("start timer (%d)", dur)
 	var errChan chan error
 	var exit bool = false
@@ -58,7 +62,7 @@ func main() {
 			log.Print("restarting Timer")
 			timer.Reset(dur)
 		}
-		if exit == true {
+		if exit {
 			break
 		}
 	}
